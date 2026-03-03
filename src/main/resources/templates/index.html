@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#addFoodModal">
+    ADD NEW +
+</button>
+
+<div class="modal fade" id="addFoodModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <form th:action="@{/add}" th:object="${newFood}" method="post" class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add New Food</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Name</label>
+                    <input type="text" th:field="*{name}" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Calories</label>
+                    <input type="number" th:field="*{calories}" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Amount</label>
+                    <input type="number" th:field="*{amount}" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Price</label>
+                    <input type="number" th:field="*{price}" class="form-control" required>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary">Add Food</button>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>
