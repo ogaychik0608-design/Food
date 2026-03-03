@@ -20,4 +20,8 @@ public class Food {
     private int calories;
     private int amount;
     private int price;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "manufacturer_id")
+    private Manufacturer manufacturer = new Manufacturer();
 }

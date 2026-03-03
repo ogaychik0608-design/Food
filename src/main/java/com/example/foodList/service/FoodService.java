@@ -10,20 +10,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class FoodService {
     private final FoodRepository foodRepository;
-
-    public List<Food> getAllFoods() {
-        return foodRepository.findAll();
-    }
-
-    public void saveFood(Food food) {
-        foodRepository.save(food);
-    }
-
-    public Food getFoodById(Long id) {
-        return foodRepository.findById(id).orElse(null);
-    }
-
-    public void deleteFood(Long id) {
-        foodRepository.deleteById(id);
-    }
+    public List<Food> getAllFoods() { return foodRepository.findAll(); }
+    public Food getFoodById(Long id) { return foodRepository.findById(id).orElse(null); }
+    public void saveFood(Food food) { foodRepository.save(food); }
+    public void deleteFood(Long id) { foodRepository.deleteById(id); }
 }

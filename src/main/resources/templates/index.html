@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Food List</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .header-bar {
+            background-color: #343a40;
+            color: white;
+            padding: 12px 20px;
+            font-size: 1.25rem;
+            margin-bottom: 25px;
+        }
+        .table thead th {
+            background-color: #e9ecef;
+            color: #495057;
+            border-bottom: 2px solid #dee2e6;
+        }
+        .btn-edit {
+            background-color: #17a2b8 !important;
+            border: none !important;
+            color: white !important;
+            padding: 4px 12px;
+            border-radius: 4px;
+        }
+        .btn-delete {
+            background-color: #dc3545 !important;
+            border: none !important;
+            color: white !important;
+            padding: 4px 12px;
+            border-radius: 4px;
+        }
+        .btn-primary-custom {
+            background-color: #0d6efd !important;
+            border: none !important;
+            color: white !important;
+            border-radius: 4px;
+        }
+        .btn-cancel {
+            background-color: #6c757d !important;
+            color: white !important;
+            border: none !important;
+            border-radius: 4px;
+        }
+        .action-cell {
+            width: 100px;
+            text-align: center;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body>
+
+<div class="header-bar">Food List</div>
+
+<div class="container-fluid px-4">
+    <button type="button" class="btn btn-primary-custom btn-sm mb-3" onclick="openAddModal()">ADD NEW +</button>
+
+    <table class="table table-bordered table-hover bg-white">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Calories (Cal)</th>
+            <th>Amount</th>
+            <th>Price (KZT)</th>
+            <th>Manufacturer (Country)</th>
+            <th class="action-cell">Edit</th>
+            <th class="action-cell">Delete</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="food : ${foods}">
+            <td th:text="${food.id}"></td>
+            <td th:text="${food.name}"></td>
+            <td th:text="${food.calories}"></td>
+            <td th:text="${food.amount}"></td>
+            <td th:text="${food.price}"></td>
+            <td th:text="${food.manufacturer != null ? food.manufacturer.name : ''}"></td>
+            <td class="action-cell">
+                <button class="btn btn-edit btn-sm" th:onclick="'openEditModal(' + ${food.id} + ')'">Edit</button>
+            </td>
+            <td class="action-cell">
+                <form th:action="@{/delete}" method="post" onsubmit="return confirm('Delete?')" class="m-0">
+                    <input type="hidden" name="id" th:value="${food.id}"/>
+                    <button type="submit" class="btn btn-delete btn-sm">Delete</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="modal fade" id="foodModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitle">Add New Food</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form th:action="@{/save}" th:object="${newFood}" method="post">
+                <div class="modal-body">
+                    <input type="hidden" th:field="*{id}" id="foodId">
+                    <div class="mb-3">
+                        <label class="form-label">Name</label>
+                        <input type="text" th:field="*{name}" id="foodName" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Calories (Cal)</label>
+                        <input type="number" th:field="*{calories}" id="foodCalories" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Amount</label>
+                        <input type="number" th:field="*{amount}" id="foodAmount" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Price (KZT)</label>
+                        <input type="number" step="0.01" th:field="*{price}" id="foodPrice" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Manufacturer (Country)</label>
+                        <select th:field="*{manufacturer.id}" id="foodManufacturer" class="form-select" required>
+                            <option th:each="m : ${manufacturers}" th:value="${m.id}" th:text="${m.name}"></option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer d-flex justify-content-start border-top-0">
+                    <button type="submit" class="btn btn-primary-custom px-3" id="submitBtn">Add Food</button>
+                    <button type="button" class="btn btn-cancel px-3" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    const foodModal = new bootstrap.Modal(document.getElementById('foodModal'));
+
+    function openAddModal() {
+        document.getElementById('modalTitle').innerText = 'Add New Food';
+        document.getElementById('submitBtn').innerText = 'Add Food';
+        document.getElementById('foodId').value = '';
+        document.getElementById('foodName').value = '';
+        document.getElementById('foodCalories').value = '';
+        document.getElementById('foodAmount').value = '';
+        document.getElementById('foodPrice').value = '';
+        document.getElementById('foodManufacturer').selectedIndex = 0;
+        foodModal.show();
+    }
+
+    function openEditModal(id) {
+        fetch('/getFood?id=' + id)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('modalTitle').innerText = 'Edit Food';
+                document.getElementById('submitBtn').innerText = 'Save';
+                document.getElementById('foodId').value = data.id;
+                document.getElementById('foodName').value = data.name;
+                document.getElementById('foodCalories').value = data.calories;
+                document.getElementById('foodAmount').value = data.amount;
+                document.getElementById('foodPrice').value = data.price;
+                if(data.manufacturer) {
+                    document.getElementById('foodManufacturer').value = data.manufacturer.id;
+                }
+                foodModal.show();
+            });
+    }
+</script>
+</body>
+</html>

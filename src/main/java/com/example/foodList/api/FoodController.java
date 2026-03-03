@@ -2,35 +2,35 @@ package com.example.foodList.api;
 
 import com.example.foodList.model.Food;
 import com.example.foodList.service.FoodService;
+import com.example.foodList.service.ManufacturerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequiredArgsConstructor
 public class FoodController {
 
     private final FoodService foodService;
+    private final ManufacturerService manufacturerService;
 
     @GetMapping("/")
     public String index(Model model) {
         model.addAttribute("foods", foodService.getAllFoods());
+        model.addAttribute("manufacturers", manufacturerService.getAllManufacturers());
         model.addAttribute("newFood", new Food());
         return "index";
     }
 
-    @PostMapping("/add")
-    public String addFood(@ModelAttribute Food food) {
-        foodService.saveFood(food);
-        return "redirect:/";
+    @GetMapping("/getFood")
+    @ResponseBody
+    public Food getFood(@RequestParam Long id) {
+        return foodService.getFoodById(id);
     }
 
-    @PostMapping("/edit")
-    public String editFood(@ModelAttribute Food food) {
+    @PostMapping("/save")
+    public String saveFood(@ModelAttribute Food food) {
         foodService.saveFood(food);
         return "redirect:/";
     }
